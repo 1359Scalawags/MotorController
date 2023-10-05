@@ -4,11 +4,13 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -22,23 +24,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * to the Dashboard.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kJoystickPort = 0;
-  private static final int kEncoderPortA = 0;
+  private static final int kEncoderPortA1 = 0;
   private static final int kEncoderPortB = 1;
 
-  private MotorController m_motorA;
+  private CANSparkMax m_motorA;
   private Joystick m_joystickA;
-  private Encoder m_encoderA;
+  private CANSparkMax m_motorB;
+  private Joystick m_joystickB;
+  private RelativeEncoder m_encoderA;
+  private RelativeEncoder m_encoderB;
 
   @Override
   public void robotInit() {
-    m_motorA = new PWMSparkMax(kMotorPort);
-    m_joystickA = new Joystick(kJoystickPort);
-    m_encoderA = new Encoder(kEncoderPortA, kEncoderPortB);
-    // Use SetDistancePerPulse to set the multiplier for GetDistance
-    // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-    m_encoderA.setDistancePerPulse((Math.PI * 6) / 360.0);
+    m_motorA = new CANSparkMax(Constants.Channels.MotorA, MotorType.kBrushless);
+    m_motorB = new CANSparkMax(Constants.Channels.MotorB, MotorType.kBrushless);
+    m_joystickA = new Joystick(Constants.Channels.JoystickA);
+    m_joystickB = new Joystick(Constants.Channels.JoystickB);
+    m_encoderA = m_motorA.getEncoder();
+    m_encoderB = m_motorB.getEncoder();
+
   }
 
   /*
@@ -47,11 +51,23 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber("Encoder", m_encoderA.getDistance());
+    SmartDashboard.putNumber("EncoderA", m_encoderA.getPosition());
+    SmartDashboard.putNumber("EncoderB", m_encoderB.getPosition());
+    SmartDashboard.putNumber("JoystickA", getJoystickValue(m_joystickA));
+    SmartDashboard.putNumber("JoystickB", getJoystickValue(m_joystickB));
   }
 
   @Override
   public void teleopPeriodic() {
-    m_motorA.set(m_joystickA.getY());
+    m_motorA.set(getJoystickValue(m_joystickA));
+    m_motorB.set(getJoystickValue(m_joystickB));
+  }
+
+  public double getJoystickValue(Joystick joystick) {
+    if(Math.abs(joystick.getY()) > Constants.Parameters.JoystickDeadband) {
+      return joystick.getY() * Constants.Parameters.JoystickMultiplier;
+    } else {
+      return 0.0;
+    }
   }
 }
