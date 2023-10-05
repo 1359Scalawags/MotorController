@@ -6,9 +6,10 @@ package frc.robot;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -43,6 +44,12 @@ public class Robot extends TimedRobot {
 
   }
 
+  @Override
+  public void simulationInit() {
+    REVPhysicsSim.getInstance().addSparkMax(m_motorA, DCMotor.getNEO(1));
+    REVPhysicsSim.getInstance().addSparkMax(m_motorB, DCMotor.getNEO(1));
+  }
+
   /*
    * The RobotPeriodic function is called every control packet no matter the
    * robot mode.
@@ -53,6 +60,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("EncoderB", m_encoderB.getPosition());
     SmartDashboard.putNumber("JoystickA", getJoystickValue(m_joystickA));
     SmartDashboard.putNumber("JoystickB", getJoystickValue(m_joystickB));
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    REVPhysicsSim.getInstance().run();
   }
 
   @Override
