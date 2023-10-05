@@ -24,8 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * to the Dashboard.
  */
 public class Robot extends TimedRobot {
-  private static final int kEncoderPortA1 = 0;
-  private static final int kEncoderPortB = 1;
 
   private CANSparkMax m_motorA;
   private Joystick m_joystickA;
