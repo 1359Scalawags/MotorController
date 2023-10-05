@@ -63,7 +63,7 @@ public class Robot extends TimedRobot {
 
   public double getJoystickValue(Joystick joystick) {
     if(Math.abs(joystick.getY()) > Constants.Parameters.JoystickDeadband) {
-      return joystick.getY() * Constants.Parameters.JoystickMultiplier;
+      return joystick.getY() * Constants.Parameters.JoystickMultiplier * (-joystick.getThrottle()+1)/2.0;
     } else {
       return 0.0;
     }
